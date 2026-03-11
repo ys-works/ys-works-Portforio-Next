@@ -127,8 +127,9 @@ ${cityData
 最終日: ${cityData[cityData.length - 1].date}
 翌日の予測値のみを整数で返してください。数値のみ。
 `;
+const apiBase = import.meta.env.DEV ? "http://localhost:3001" : "";
 
-        const res = await fetch("/api/predict", {
+const res = await fetch(`${apiBase}/api/predict`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ prompt }),
