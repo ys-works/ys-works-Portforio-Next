@@ -5,24 +5,24 @@ import pollenData from "./json/tokyo_pollen_all.json";
 import { CITY_NAMES, COLORS } from "./constants/pollenConstants";
 import type { PollenRecord, ChartRow, PredRow, CityLine } from "./types/pollen";
 
-import CitySelector      from "./components/CitySelector";
-import GeminiPanel       from "./components/GeminiPanel";
-import ChartTypeToggle   from "./components/ChartTypeToggle";
-import PollenChart       from "./components/PollenChart";
+import CitySelector from "./components/CitySelector";
+import GeminiPanel from "./components/GeminiPanel";
+import ChartTypeToggle from "./components/ChartTypeToggle";
+import PollenChart from "./components/PollenChart";
 import PollenLevelLegend from "./components/PollenLevelLegend";
-import PredictionTable   from "./components/PredictionTable";
+import PredictionTable from "./components/PredictionTable";
 
 export default function App() {
-  const [rawData, setRawData]               = useState<PollenRecord[]>([]);
-  const [chartData, setChartData]           = useState<ChartRow[]>([]);
-  const [predData, setPredData]             = useState<PredRow[]>([]);
+  const [rawData, setRawData] = useState<PollenRecord[]>([]);
+  const [chartData, setChartData] = useState<ChartRow[]>([]);
+  const [predData, setPredData] = useState<PredRow[]>([]);
   const [selectedCities, setSelectedCities] = useState<number[]>([]);
   const [availableCities, setAvailableCities] = useState<number[]>([]);
-  const [chartType, setChartType]           = useState<"line" | "bar">("line");
-  const [showAvg, setShowAvg]               = useState<boolean>(true);
-  const [predicting, setPredicting]         = useState<boolean>(false);
-  const [predError, setPredError]           = useState<string>("");
-  const [dateRange, setDateRange]           = useState<{ start: string; end: string }>({
+  const [chartType, setChartType] = useState<"line" | "bar">("line");
+  const [showAvg, setShowAvg] = useState<boolean>(true);
+  const [predicting, setPredicting] = useState<boolean>(false);
+  const [predError, setPredError] = useState<string>("");
+  const [dateRange, setDateRange] = useState<{ start: string; end: string }>({
     start: "",
     end: "",
   });
@@ -35,7 +35,9 @@ export default function App() {
   // データ初期化
   useEffect(() => {
     if (!rawData.length) return;
-    const cities = [...new Set(rawData.map((r) => r.citycode))].sort((a, b) => a - b);
+    const cities = [...new Set(rawData.map((r) => r.citycode))].sort(
+      (a, b) => a - b,
+    );
     setAvailableCities(cities);
     setSelectedCities(cities.slice(0, 3));
     const dates = rawData.map((r) => r.date.slice(0, 10));
@@ -67,26 +69,34 @@ export default function App() {
       for (const [date, vals] of Object.entries(allByDate)) {
         if (!byDate[date]) byDate[date] = { date };
         byDate[date]["東京都平均"] = Math.round(
-          vals.reduce((a, b) => a + b, 0) / vals.length
+          vals.reduce((a, b) => a + b, 0) / vals.length,
         );
       }
     }
 
-    const sorted = Object.values(byDate).sort((a, b) => a.date.localeCompare(b.date));
+    const sorted = Object.values(byDate).sort((a, b) =>
+      a.date.localeCompare(b.date),
+    );
     setChartData(sorted);
     setPredData([]);
   }, [rawData, selectedCities, showAvg]);
 
   const toggleCity = (code: number) => {
     setSelectedCities((prev) =>
-      prev.includes(code) ? prev.filter((c) => c !== code) : [...prev, code]
+      prev.includes(code) ? prev.filter((c) => c !== code) : [...prev, code],
     );
   };
 
   // Gemini予測（選択中の市区町村ごと）
   const predict = useCallback(async () => {
-    if (!chartData.length) { setPredError("データを先に読み込んでください"); return; }
-    if (!selectedCities.length) { setPredError("市区町村を選択してください"); return; }
+    if (!chartData.length) {
+      setPredError("データを先に読み込んでください");
+      return;
+    }
+    if (!selectedCities.length) {
+      setPredError("市区町村を選択してください");
+      return;
+    }
 
     setPredicting(true);
     setPredError("");
@@ -109,13 +119,16 @@ export default function App() {
 このデータに基づき、翌日の花粉飛散数を予測してください。
 
 過去データ（日付, 花粉数）:
-${cityData.slice(-7).map((d) => `${d.date}: ${d.pollen}`).join("\n")}
+${cityData
+  .slice(-7)
+  .map((d) => `${d.date}: ${d.pollen}`)
+  .join("\n")}
 
 最終日: ${cityData[cityData.length - 1].date}
 翌日の予測値のみを整数で返してください。数値のみ。
 `;
 
-        const res = await fetch("http://localhost:3001/api/predict", {
+        const res = await fetch("/api/predict", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ prompt }),
@@ -125,19 +138,21 @@ ${cityData.slice(-7).map((d) => `${d.date}: ${d.pollen}`).join("\n")}
           const errorData = await res.json().catch(() => ({}));
           const errorMsg = errorData?.error || `HTTP ${res.status}`;
           if (res.status === 429) {
-            throw new Error(`APIレート制限超過: 数分待ってから再度お試しください`);
+            throw new Error(
+              `APIレート制限超過: 数分待ってから再度お試しください`,
+            );
           }
           throw new Error(`API Error: ${errorMsg}`);
         }
-        
+
         const json = await res.json();
         const text = json.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
         const pollenValue = parseInt(text.match(/\d+/)?.[0] ?? "0");
-        
+
         const lastDate = new Date(cityData[cityData.length - 1].date);
         lastDate.setDate(lastDate.getDate() + 1);
         const nextDate = lastDate.toISOString().slice(0, 10);
-        
+
         predictions.push({
           date: nextDate,
           citycode,
@@ -145,7 +160,7 @@ ${cityData.slice(-7).map((d) => `${d.date}: ${d.pollen}`).join("\n")}
           pollen: pollenValue,
         });
       }
-      
+
       setPredData(predictions);
     } catch (e) {
       setPredError(e instanceof Error ? e.message : "予測エラーが発生しました");
@@ -159,7 +174,8 @@ ${cityData.slice(-7).map((d) => `${d.date}: ${d.pollen}`).join("\n")}
   if (predData.length) {
     const predByDate: Record<string, ChartRow> = {};
     for (const p of predData) {
-      if (!predByDate[p.date]) predByDate[p.date] = { date: p.date, _predicted: true };
+      if (!predByDate[p.date])
+        predByDate[p.date] = { date: p.date, _predicted: true };
       predByDate[p.date][p.cityName || `予測${p.citycode}`] = p.pollen;
     }
     mergedData.push(...Object.values(predByDate));
@@ -170,7 +186,8 @@ ${cityData.slice(-7).map((d) => `${d.date}: ${d.pollen}`).join("\n")}
     color: COLORS[i % COLORS.length],
   }));
 
-  const lastHistoricalDate = chartData.length > 0 ? chartData[chartData.length - 1].date : "";
+  const lastHistoricalDate =
+    chartData.length > 0 ? chartData[chartData.length - 1].date : "";
 
   return (
     <div className="app-container">
