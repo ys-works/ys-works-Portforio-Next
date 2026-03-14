@@ -1,0 +1,32 @@
+name: Update Pollen Data
+
+on:
+  schedule:
+    - cron: '0 16 * * *'  # UTC 16:00 = JST 01:00
+  workflow_dispatch:        # GitHub上から手動実行できるボタン
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests pytz
+
+      - name: Run update script
+        run: python src/script/update_pollen.py
+
+      - name: Commit and push updated JSON
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add src/json/tokyo_pollen_all.json
+          git diff --cached --quiet || git commit -m "chore: update pollen data"
+          git push
