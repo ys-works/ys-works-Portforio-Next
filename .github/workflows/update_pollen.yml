@@ -21,7 +21,7 @@ jobs:
         run: pip install requests pytz
 
       - name: Run update script
-        run: python src/script/workflows/update_pollen.py
+        run: python script/workflows/update_pollen.py
 
       - name: Commit and push updated JSON
         run: |
