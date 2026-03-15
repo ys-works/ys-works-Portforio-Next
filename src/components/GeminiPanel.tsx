@@ -2,13 +2,15 @@ import type { PredRow } from "../types/pollen";
 
 interface Props {
   predicting: boolean;
+  predictingHorizon: 1 | 3 | 7 | null;
   predError: string;
   predData: PredRow[];
-  onPredict: () => void;
+  onPredict: (horizon: 1 | 3 | 7) => void;
 }
 
 export default function GeminiPanel({
   predicting,
+  predictingHorizon,
   predError,
   predData,
   onPredict,
@@ -21,11 +23,25 @@ export default function GeminiPanel({
 
       <div className="gemini-panel-controls">
         <button
-          className="btn gemini-predict-btn"
-          onClick={onPredict}
-          disabled={predicting}
+          className={`btn gemini-predict-btn ${predictingHorizon === 1 ? "active" : ""}`}
+          onClick={() => onPredict(1)}
+          disabled={predicting && predictingHorizon !== 1}
         >
-          {predicting ? "予測中…" : "✦ 翌日の予測"}
+          {predicting && predictingHorizon === 1 ? "予測中…" : "✦ 翌日の予測"}
+        </button>
+        <button
+          className={`btn gemini-predict-btn ${predictingHorizon === 3 ? "active" : ""}`}
+          onClick={() => onPredict(3)}
+          disabled={predicting && predictingHorizon !== 3}
+        >
+          {predicting && predictingHorizon === 3 ? "予測中…" : "✦ 3日間の予測"}
+        </button>
+        <button
+          className={`btn gemini-predict-btn ${predictingHorizon === 7 ? "active" : ""}`}
+          onClick={() => onPredict(7)}
+          disabled={predicting && predictingHorizon !== 7}
+        >
+          {predicting && predictingHorizon === 7 ? "予測中…" : "✦ 1週間の予測"}
         </button>
       </div>
 

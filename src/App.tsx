@@ -21,6 +21,7 @@ export default function App() {
   const [chartType, setChartType] = useState<"line" | "bar">("line");
   const [showAvg, setShowAvg] = useState<boolean>(true);
   const [predicting, setPredicting] = useState<boolean>(false);
+  const [predictingHorizon, setPredictingHorizon] = useState<1 | 3 | 7 | null>(null);
   const [predError, setPredError] = useState<string>("");
   const [dateRange, setDateRange] = useState<{ start: string; end: string }>({
     start: "",
@@ -88,7 +89,7 @@ export default function App() {
   };
 
   // Gemini予測（選択中の市区町村ごと）
-  const predict = useCallback(async () => {
+  const predict = useCallback(async (horizon: 1 | 3 | 7) => {
     if (!chartData.length) {
       setPredError("データを先に読み込んでください");
       return;
@@ -98,7 +99,10 @@ export default function App() {
       return;
     }
 
+    const dayCount = horizon;
+
     setPredicting(true);
+    setPredictingHorizon(horizon);
     setPredError("");
     setPredData([]);
 
@@ -114,22 +118,11 @@ export default function App() {
 
         if (cityData.length === 0) continue;
 
-        const prompt = `
-あなたは花粉データを分析する専門家です。以下は${cityName}の花粉飛散数（個/cm²）の時系列データです。
-このデータに基づき、翌日の花粉飛散数を予測してください。
+        const prompt = horizon === 1 ? `\nあなたは花粉データを分析する専門家です。以下は${cityName}の花粉飛散数（個/cm²）の時系列データです。\nこのデータに基づき、翌日の花粉飛散数を予測してください。\n\n過去データ（日付, 花粉数）:\n${cityData.slice(-7).map((d) => `${d.date}: ${d.pollen}`).join("\n")}\n\n最終日: ${cityData[cityData.length - 1].date}\n予測値のみを整数で返してください。\n` : `\nあなたは花粉データを分析する専門家です。以下は${cityName}の花粉飛散数（個/cm²）の時系列データです。\nこのデータに基づき、次の${dayCount}日間の花粉飛散数を日別に予測してください。\n\n過去データ（日付, 花粉数）:\n${cityData.slice(-7).map((d) => `${d.date}: ${d.pollen}`).join("\n")}\n\n最終日: ${cityData[cityData.length - 1].date}\n出力は「1日目: 数値、2日目: 数値, ...」のように各日付の整数のみを返してください。\n`;
 
-過去データ（日付, 花粉数）:
-${cityData
-  .slice(-7)
-  .map((d) => `${d.date}: ${d.pollen}`)
-  .join("\n")}
+        const apiBase = import.meta.env.DEV ? "http://localhost:3001" : "";
 
-最終日: ${cityData[cityData.length - 1].date}
-翌日の予測値のみを整数で返してください。数値のみ。
-`;
-const apiBase = import.meta.env.DEV ? "http://localhost:3001" : "";
-
-const res = await fetch(`${apiBase}/api/predict`, {
+        const res = await fetch(`${apiBase}/api/predict`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ prompt }),
@@ -148,18 +141,20 @@ const res = await fetch(`${apiBase}/api/predict`, {
 
         const json = await res.json();
         const text = json.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
-        const pollenValue = parseInt(text.match(/\d+/)?.[0] ?? "0");
+        const numbers = [...text.matchAll(/\d+/g)].map((m) => parseInt(m[0] ?? "0", 10));
 
         const lastDate = new Date(cityData[cityData.length - 1].date);
-        lastDate.setDate(lastDate.getDate() + 1);
-        const nextDate = lastDate.toISOString().slice(0, 10);
-
-        predictions.push({
-          date: nextDate,
-          citycode,
-          cityName,
-          pollen: pollenValue,
-        });
+        for (let i = 1; i <= dayCount; i += 1) {
+          const value = numbers[i - 1] ?? 0;
+          const date = new Date(lastDate);
+          date.setDate(date.getDate() + i);
+          predictions.push({
+            date: date.toISOString().slice(0, 10),
+            citycode,
+            cityName,
+            pollen: value,
+          });
+        }
       }
 
       setPredData(predictions);
@@ -167,6 +162,7 @@ const res = await fetch(`${apiBase}/api/predict`, {
       setPredError(e instanceof Error ? e.message : "予測エラーが発生しました");
     } finally {
       setPredicting(false);
+      setPredictingHorizon(null);
     }
   }, [chartData, selectedCities, rawData]);
 
@@ -225,6 +221,7 @@ const res = await fetch(`${apiBase}/api/predict`, {
               />
               <GeminiPanel
                 predicting={predicting}
+                predictingHorizon={predictingHorizon}
                 predError={predError}
                 predData={predData}
                 onPredict={predict}

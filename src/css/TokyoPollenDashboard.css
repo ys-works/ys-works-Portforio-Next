@@ -404,7 +404,11 @@ body {
   color: #e2e8f0;
   -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
-  max-width: 250px;
+  width: min(420px, 90vw);
+  max-width: 420px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .tooltip-label {
@@ -415,7 +419,8 @@ body {
 }
 
 .tooltip-item {
-  display: flex;
+  display: grid;
+  grid-template-columns: 12px auto auto auto;
   align-items: center;
   gap: 6px;
   margin-bottom: 3px;
@@ -426,11 +431,28 @@ body {
   height: 8px;
   border-radius: 50%;
   display: inline-block;
+  background: #fff;
 }
 
 .tooltip-name {
+  min-width: 70px;
   color: #94a3b8;
   font-size: 11px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+  .tooltip-value {
+  font-weight: 700;
+  font-size: 12px;
+  min-width: 90px;
+  white-space: nowrap;
+}
+
+.tooltip-level {
+  font-size: 10px;
+  white-space: nowrap;
 }
 
 .tooltip-value {

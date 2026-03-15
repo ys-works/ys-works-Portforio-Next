@@ -63,9 +63,10 @@ export default function PollenChart({
               dy: 40,
             }}
           />
-          <Tooltip 
-            content={<CustomTooltip />} 
-            cursor={{ strokeDasharray: '3 3' }}
+          <Tooltip
+            content={<CustomTooltip />}
+            cursor={{ strokeDasharray: "3 3" }}
+            wrapperStyle={{ left: 0, top: 0 }}
           />
           <Legend
             wrapperStyle={{ fontSize: 11, color: "#94a3b8", paddingTop: 12 }}
@@ -100,7 +101,7 @@ export default function PollenChart({
                 opacity={0.8}
                 radius={[2, 2, 0, 0]}
               />
-            )
+            ),
           )}
 
           {showAvg && chartType === "line" && (

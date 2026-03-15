@@ -1,32 +1,46 @@
+import { useEffect, useRef } from "react";
 import { pollenLevel } from "../utils/pollenUtils";
 
 interface Props {
   active?: boolean;
   payload?: Array<{ value: number; color?: string; name?: string }>;
   label?: string;
+  coordinate?: { x?: number; y?: number };
 }
 
-export default function CustomTooltip({ active, payload, label }: Props) {
-  if (!active || !payload?.length) return null;
+export default function CustomTooltip({ active, payload, label, coordinate }: Props) {
+  const tooltipRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!tooltipRef.current || coordinate == null) return;
+    const container = tooltipRef.current;
+    container.style.position = "absolute";
+    container.style.left = `${coordinate.x ?? 0}px`;
+    container.style.top = `${coordinate.y ?? 0}px`;
+    container.style.transform = "translate(-50%, -120%)";
+    container.style.pointerEvents = "none";
+
+    const dots = container.querySelectorAll<HTMLSpanElement>(".tooltip-dot");
+    dots.forEach((dot) => {
+      const color = dot.getAttribute("data-color");
+      dot.style.background = color ?? "#fff";
+    });
+  }, [coordinate, payload]);
+
+  if (!active || !payload?.length || coordinate == null) return null;
 
   return (
-    <div className="tooltip-container">
+    <div ref={tooltipRef} className="tooltip-container">
       <div className="tooltip-label">{label}</div>
       {payload.map((p, idx) => {
         const value = typeof p.value === "number" ? p.value : 0;
         const lv = pollenLevel(value);
         return (
           <div key={idx} className="tooltip-item">
-            <span className="tooltip-dot" style={{ background: p.color }} />
+            <span className="tooltip-dot" data-color={p.color ?? "#fff"} />
             <span className="tooltip-name">{p.name}:</span>
-            <span className="tooltip-value" style={{ color: lv.color }}>
-              {value < 0 ? "欠測" : `${value} 個/cm\xb2`}
-            </span>
-            {value >= 0 && (
-              <span className="tooltip-level" style={{ color: lv.color }}>
-                ({lv.label})
-              </span>
-            )}
+            <span className="tooltip-value">{value < 0 ? "欠測" : `${value} 個/cm\xb2`}</span>
+            {value >= 0 && <span className="tooltip-level">({lv.label})</span>}
           </div>
         );
       })}
