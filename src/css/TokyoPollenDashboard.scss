@@ -4,33 +4,30 @@
 // Variables
 // ============================================================
 
-// Colors
-$color-bg:          rgb(35, 35, 35);
-$color-surface:     rgba(255, 255, 255, 0.03);
-$color-border:      #1e3a5f;
+$color-bg:       rgb(35, 35, 35);
+$color-surface:  rgba(255, 255, 255, 0.03);
+$color-border:   #1e3a5f;
 
-$color-sky:         #38bdf8;
-$color-indigo:      #818cf8;
-$color-emerald:     #34d399;
-$color-amber:       #fbbf24;
-$color-orange:      #fb923c;
-$color-red:         #f87171;
-$color-pink:        #f472b6;
-$color-violet:      #a78bfa;
-$color-blue:        #60a5fa;
-$color-green:       #4ade80;
-$color-fuchsia:     #e879f9;
+$color-sky:      #38bdf8;
+$color-indigo:   #818cf8;
+$color-emerald:  #34d399;
+$color-amber:    #fbbf24;
+$color-orange:   #fb923c;
+$color-red:      #f87171;
+$color-pink:     #f472b6;
+$color-violet:   #a78bfa;
+$color-blue:     #60a5fa;
+$color-green:    #4ade80;
+$color-fuchsia:  #e879f9;
 
-$color-text:        #e2e8f0;
-$color-muted:       #94a3b8;
-$color-dim:         #475569;
-$color-faint:       #334155;
+$color-text:     #e2e8f0;
+$color-muted:    #94a3b8;
+$color-dim:      #475569;
+$color-faint:    #334155;
 
-// Font families
-$font-sans:         'DM Sans', 'Noto Sans JP', sans-serif;
-$font-mono:         'DM Mono', monospace;
+$font-sans:      'DM Sans', 'Noto Sans JP', sans-serif;
+$font-mono:      'DM Mono', monospace;
 
-// Chip colors (selected state)
 $chip-colors: (
   0: $color-sky,
   1: $color-pink,
@@ -44,7 +41,6 @@ $chip-colors: (
   9: $color-fuchsia,
 );
 
-// Pollen level colors
 $pollen-levels: (
   0: #10b981,
   1: $color-emerald,
@@ -80,25 +76,9 @@ $pollen-level-names: (
   margin-bottom: 14px;
 }
 
-@mixin mono-small {
-  font-family: $font-mono;
-  font-size: 11px;
-}
-
 @mixin backdrop {
   -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
-}
-
-@mixin hover-lift {
-  transition: all 0.2s ease;
-  &:hover {
-    filter: brightness(1.15);
-    transform: translateY(-1px);
-  }
-  &:active {
-    transform: translateY(0);
-  }
 }
 
 // ============================================================
@@ -113,13 +93,15 @@ $pollen-level-names: (
 
 ::-webkit-scrollbar {
   width: 4px;
+}
 
-  &-track { background: #0a0f1e; }
+::-webkit-scrollbar-track {
+  background: #0a0f1e;
+}
 
-  &-thumb {
-    background: $color-border;
-    border-radius: 2px;
-  }
+::-webkit-scrollbar-thumb {
+  background: $color-border;
+  border-radius: 2px;
 }
 
 .recharts-responsive-container div {
@@ -168,45 +150,47 @@ body {
 
   > div {
     margin: 0;
-
-    &:nth-of-type(3) { margin-left: auto; }
   }
 
-  &-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    background: linear-gradient(135deg, $color-sky, $color-indigo);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-  }
-
-  &-title {
-    font-size: 16px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-  }
-
-  &-subtitle {
-    font-size: 11px;
-    color: $color-dim;
-    font-family: $font-mono;
-  }
-
-  &-status {
+  > div:nth-of-type(3) {
     margin-left: auto;
-    display: flex;
-    gap: 8px;
-    align-items: center;
   }
+}
 
-  &-date {
-    font-size: 11px;
-    color: $color-sky;
-    font-family: monospace;
-  }
+.header-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, $color-sky, $color-indigo);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.header-title {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.header-subtitle {
+  font-size: 11px;
+  color: $color-dim;
+  font-family: $font-mono;
+}
+
+.header-status {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.header-date {
+  font-size: 11px;
+  color: $color-sky;
+  font-family: monospace;
 }
 
 .status-indicator {
@@ -244,7 +228,6 @@ body {
     transform: translateY(-1px);
   }
 
-  // Generate selected color variants from map
   @each $index, $color in $chip-colors {
     &.selected[data-color-index="#{$index}"] {
       border-color: $color;
@@ -261,7 +244,16 @@ body {
 .btn {
   cursor: pointer;
   border: none;
-  @include hover-lift;
+  transition: all 0.2s ease;
+
+  &:hover {
+    filter: brightness(1.15);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
 
   &.active {
     background: $color-sky;
@@ -286,22 +278,22 @@ body {
     border-color: $color-sky;
     background: rgba($color-sky, 0.04);
   }
+}
 
-  &-icon {
-    font-size: 40px;
-    margin-bottom: 16px;
-  }
+.upload-icon {
+  font-size: 40px;
+  margin-bottom: 16px;
+}
 
-  &-title {
-    font-size: 16px;
-    font-weight: 500;
-    margin-bottom: 8px;
-  }
+.upload-title {
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
 
-  &-subtitle {
-    font-size: 13px;
-    color: $color-dim;
-  }
+.upload-subtitle {
+  font-size: 13px;
+  color: $color-dim;
 }
 
 // ============================================================
@@ -345,7 +337,9 @@ body {
   font-size: 12px;
   margin-top: 12px;
 
-  input { accent-color: $color-sky; }
+  input {
+    accent-color: $color-sky;
+  }
 }
 
 .checkbox-text {
@@ -469,36 +463,34 @@ body {
   }
 }
 
-.period-selector {
-  &-row {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-bottom: 12px;
+.period-selector-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.period-selector-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #cbd5e1;
+  font-family: $font-mono;
+
+  label {
+    color: $color-muted;
+    font-size: 11px;
   }
 
-  &-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+  select {
+    background: #0f172a;
+    color: $color-text;
+    border: 1px solid #1e293b;
+    border-radius: 6px;
+    padding: 4px 8px;
     font-size: 12px;
-    color: #cbd5e1;
     font-family: $font-mono;
-
-    label {
-      color: $color-muted;
-      font-size: 11px;
-    }
-
-    select {
-      background: #0f172a;
-      color: $color-text;
-      border: 1px solid #1e293b;
-      border-radius: 6px;
-      padding: 4px 8px;
-      font-size: 12px;
-      font-family: $font-mono;
-    }
   }
 }
 
@@ -534,7 +526,7 @@ body {
 }
 
 // ============================================================
-// Prediction Results (card style)
+// Prediction Results
 // ============================================================
 
 .prediction-results {
@@ -543,15 +535,14 @@ body {
   border: 1px solid rgba($color-indigo, 0.15);
   border-radius: 14px;
   padding: 20px;
+}
 
-  &-title,
-  .prediction-title {
-    font-size: 11px;
-    color: $color-indigo;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    margin-bottom: 14px;
-  }
+.prediction-title {
+  font-size: 11px;
+  color: $color-indigo;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 14px;
 }
 
 .prediction-grid {
@@ -590,66 +581,64 @@ body {
 // Tooltip
 // ============================================================
 
-.tooltip {
-  &-container {
-    background: rgba(30, 30, 30, 0.97);
-    border: 1px solid $color-border;
-    border-radius: 10px;
-    padding: 8px 12px;
-    font-size: 12px;
-    color: $color-text;
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: blur(8px);
-    width: min(420px, 90vw);
-    max-width: 420px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
+.tooltip-container {
+  background: rgba(30, 30, 30, 0.97);
+  border: 1px solid $color-border;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 12px;
+  color: $color-text;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  width: min(420px, 90vw);
+  max-width: 420px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
-  &-label {
-    margin-bottom: 4px;
-    color: $color-muted;
-    font-family: monospace;
-    font-size: 11px;
-  }
+.tooltip-label {
+  margin-bottom: 4px;
+  color: $color-muted;
+  font-family: monospace;
+  font-size: 11px;
+}
 
-  &-item {
-    display: grid;
-    grid-template-columns: 12px auto auto auto;
-    align-items: center;
-    gap: 6px;
-    margin-bottom: 3px;
-  }
+.tooltip-item {
+  display: grid;
+  grid-template-columns: 12px auto auto auto;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 3px;
+}
 
-  &-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    display: inline-block;
-    background: #fff;
-  }
+.tooltip-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  background: #fff;
+}
 
-  &-name {
-    min-width: 70px;
-    color: $color-muted;
-    font-size: 11px;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-  }
+.tooltip-name {
+  min-width: 70px;
+  color: $color-muted;
+  font-size: 11px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
 
-  &-value {
-    font-weight: 700;
-    font-size: 12px;
-    min-width: 90px;
-    white-space: nowrap;
-  }
+.tooltip-value {
+  font-weight: 700;
+  font-size: 12px;
+  min-width: 90px;
+  white-space: nowrap;
+}
 
-  &-level {
-    font-size: 10px;
-    white-space: nowrap;
-  }
+.tooltip-level {
+  font-size: 10px;
+  white-space: nowrap;
 }
 
 // ============================================================
@@ -659,16 +648,16 @@ body {
 .gemini-panel {
   @include panel-base;
   border: 1px solid rgba($color-indigo, 0.2);
+}
 
-  &-title {
-    @include panel-title;
-  }
+.gemini-panel-title {
+  @include panel-title;
+}
 
-  &-controls {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-  }
+.gemini-panel-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
 }
 
 .gemini-predict-btn {
@@ -689,8 +678,17 @@ body {
   }
 }
 
-.gemini-error   { margin-top: 10px; font-size: 11px; color: $color-red; }
-.gemini-success { margin-top: 10px; font-size: 11px; color: $color-indigo; }
+.gemini-error {
+  margin-top: 10px;
+  font-size: 11px;
+  color: $color-red;
+}
+
+.gemini-success {
+  margin-top: 10px;
+  font-size: 11px;
+  color: $color-indigo;
+}
 
 // ============================================================
 // City Selector Panel
@@ -699,40 +697,45 @@ body {
 .city-selector-panel {
   @include panel-base;
   border: 1px solid rgba($color-sky, 0.1);
+}
 
-  &-title {
-    @include panel-title;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    color: #9299a1;
+.city-selector-title {
+  @include panel-title;
+  color: #9299a1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.city-selector-list {
+  padding: 4px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.city-selector-checkbox {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.city-selector-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 12px;
+
+  input {
+    accent-color: $color-sky;
   }
 
-  &-list {
-    padding: 4px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    max-height: 180px;
-    overflow-y: auto;
-  }
-
-  &-checkbox {
-    margin-top: 12px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  &-label {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    cursor: pointer;
-    font-size: 12px;
-
-    input { accent-color: $color-sky; }
-    span  { color: $color-muted; }
+  span {
+    color: $color-muted;
   }
 }
 
@@ -776,28 +779,30 @@ body {
   font-size: 11px;
   color: $color-dim;
   flex-wrap: wrap;
+}
 
-  &-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
+.pollen-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
 
-  &-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 2px;
-    display: inline-block;
+.pollen-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  display: inline-block;
 
-    @each $index, $color in $pollen-levels {
-      &[data-level-index="#{$index}"] { background: $color; }
+  @each $index, $color in $pollen-levels {
+    &[data-level-index="#{$index}"] {
+      background: $color;
     }
   }
+}
 
-  &-range {
-    color: $color-faint;
-    font-family: monospace;
-  }
+.pollen-legend-range {
+  color: $color-faint;
+  font-family: monospace;
 }
 
 // ============================================================
@@ -810,56 +815,56 @@ body {
   border: 1px solid rgba($color-indigo, 0.15);
   border-radius: 14px;
   padding: 20px;
+}
 
-  &-title {
+.prediction-table-title {
+  font-size: 11px;
+  color: $color-indigo;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+
+.prediction-table-table-wrap {
+  overflow-x: auto;
+  border: 1px solid rgba($color-indigo, 0.2);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.prediction-table-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 500px;
+
+  th,
+  td {
+    border-bottom: 1px solid rgba($color-muted, 0.16);
+    padding: 8px 10px;
+    font-size: 12px;
+    text-align: left;
+    color: $color-text;
+  }
+
+  th {
     font-size: 11px;
-    color: $color-indigo;
-    letter-spacing: 2px;
+    color: $color-muted;
     text-transform: uppercase;
-    margin-bottom: 14px;
+    letter-spacing: 0.5px;
   }
 
-  &-table-wrap {
-    overflow-x: auto;
-    border: 1px solid rgba($color-indigo, 0.2);
-    border-radius: 10px;
-    background: rgba(0, 0, 0, 0.2);
+  tr:hover {
+    background: rgba($color-muted, 0.08);
   }
+}
 
-  &-table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 500px;
-
-    th,
-    td {
-      border-bottom: 1px solid rgba($color-muted, 0.16);
-      padding: 8px 10px;
-      font-size: 12px;
-      text-align: left;
-      color: $color-text;
-    }
-
-    th {
-      font-size: 11px;
-      color: $color-muted;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    tr:hover { background: rgba($color-muted, 0.08); }
+@each $level, $color in $pollen-level-names {
+  .prediction-table-card.level-#{$level} {
+    border: 1px solid rgba($color, 0.267);
   }
-
-  // Level variants (card border + value/label color)
-  &-card,
-  &-value,
-  &-label {
-    @each $level, $color in $pollen-level-names {
-      &.level-#{$level} {
-        @if str-index('#{&}', 'card') { border: 1px solid rgba($color, 0.267); }
-        @else { color: $color; }
-      }
-    }
+  .prediction-table-value.level-#{$level},
+  .prediction-table-label.level-#{$level} {
+    color: $color;
   }
 }
 
