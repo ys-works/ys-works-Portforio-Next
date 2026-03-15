@@ -1,4 +1,4 @@
-import { CITY_NAMES, COLORS } from "../constants/pollenConstants";
+import { CITY_NAMES } from "../constants/pollenConstants";
 
 interface Props {
   availableCities: number[];
@@ -6,6 +6,8 @@ interface Props {
   onToggle: (code: number) => void;
   showAvg: boolean;
   onShowAvgChange: (val: boolean) => void;
+  cityColorIndexByCode: Record<number, number>;
+  onReset: () => void;
 }
 
 export default function CitySelector({
@@ -14,16 +16,26 @@ export default function CitySelector({
   onToggle,
   showAvg,
   onShowAvgChange,
+  cityColorIndexByCode,
+  onReset,
 }: Props) {
   return (
     <div className="city-selector-panel">
       <div className="city-selector-title">
-        市区町村を選択
+        <span>市区町村を選択</span>
+        <button
+          className="reset-button"
+          onClick={onReset}
+          type="button"
+          title="すべての選択をリセット"
+        >
+          リセット
+        </button>
       </div>
       <div className="city-selector-list">
         {availableCities.map((code) => {
           const selected = selectedCities.includes(code);
-          const colorIndex = selectedCities.indexOf(code) % COLORS.length;
+          const colorIndex = cityColorIndexByCode[code] ?? 0;
           return (
             <div
               key={code}

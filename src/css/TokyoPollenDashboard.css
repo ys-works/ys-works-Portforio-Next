@@ -134,11 +134,15 @@ body {
 }
 
 .city-chip.selected[data-color-index="0"] { border-color: #38bdf8; background: #38bdf822; color: #38bdf8; }
-.city-chip.selected[data-color-index="1"] { border-color: #818cf8; background: #818cf822; color: #818cf8; }
-.city-chip.selected[data-color-index="2"] { border-color: #fb923c; background: #fb923c22; color: #fb923c; }
-.city-chip.selected[data-color-index="3"] { border-color: #34d399; background: #34d39922; color: #34d399; }
-.city-chip.selected[data-color-index="4"] { border-color: #f472b6; background: #f472b622; color: #f472b6; }
+.city-chip.selected[data-color-index="1"] { border-color: #f472b6; background: #f472b622; color: #f472b6; }
+.city-chip.selected[data-color-index="2"] { border-color: #34d399; background: #34d39922; color: #34d399; }
+.city-chip.selected[data-color-index="3"] { border-color: #fb923c; background: #fb923c22; color: #fb923c; }
+.city-chip.selected[data-color-index="4"] { border-color: #a78bfa; background: #a78bfa22; color: #a78bfa; }
 .city-chip.selected[data-color-index="5"] { border-color: #fbbf24; background: #fbbf2422; color: #fbbf24; }
+.city-chip.selected[data-color-index="6"] { border-color: #60a5fa; background: #60a5fa22; color: #60a5fa; }
+.city-chip.selected[data-color-index="7"] { border-color: #f87171; background: #f8717122; color: #f87171; }
+.city-chip.selected[data-color-index="8"] { border-color: #4ade80; background: #4ade8022; color: #4ade80; }
+.city-chip.selected[data-color-index="9"] { border-color: #e879f9; background: #e879f922; color: #e879f9; }
 
 .btn {
   cursor: pointer;
@@ -613,6 +617,9 @@ body {
   letter-spacing: 2px;
   text-transform: uppercase;
   margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .city-selector-list {
@@ -777,3 +784,26 @@ body {
 .prediction-table-label.level-high { color: #fb923c; }
 .prediction-table-value.level-very-high,
 .prediction-table-label.level-very-high { color: #f87171; }
+
+.reset-button {
+  background: rgba(56, 189, 248, 0.1);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  color: #38bdf8;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  margin-right: 0;
+}
+
+.reset-button:hover {
+  background: rgba(56, 189, 248, 0.2);
+  border-color: rgba(56, 189, 248, 0.6);
+  transform: translateY(-1px);
+}
+
+.reset-button:active {
+  transform: translateY(0);
+}

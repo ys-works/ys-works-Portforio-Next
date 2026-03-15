@@ -29,10 +29,18 @@ export default function CustomTooltip({ active, payload, label, coordinate }: Pr
 
   if (!active || !payload?.length || coordinate == null) return null;
 
+  const sortedPayload = [...payload].sort((a, b) => {
+    const aIsAvg = a.name === "東京都平均";
+    const bIsAvg = b.name === "東京都平均";
+    if (aIsAvg) return 1;
+    if (bIsAvg) return -1;
+    return 0;
+  });
+
   return (
     <div ref={tooltipRef} className="tooltip-container">
       <div className="tooltip-label">{label}</div>
-      {payload.map((p, idx) => {
+      {sortedPayload.map((p, idx) => {
         const value = p.value;
         const isMissing = value == null || (typeof value === "number" && value < 0);
         const displayValue = isMissing ? "欠測" : `${value} 個/cm²`;
