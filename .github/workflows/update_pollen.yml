@@ -18,7 +18,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install requests pytz
+        run: pip install requests pytz apscheduler
 
       - name: Run update script
         run: python src/script/diff-update.py
