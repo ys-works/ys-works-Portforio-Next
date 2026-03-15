@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "./css/TokyoPollenDashboard.css";
+import "./css/TokyoPollenDashboard.scss";
 import pollenData from "./json/tokyo_pollen_all.json";
 
 import type { PollenRecord } from "./types/pollen";
