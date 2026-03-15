@@ -19,7 +19,10 @@ export default function App() {
   const [selectedCities, setSelectedCities] = useState<number[]>([]);
   const [availableCities, setAvailableCities] = useState<number[]>([]);
   const [chartType, setChartType] = useState<"line" | "bar">("line");
+  const [dateGranularity, setDateGranularity] = useState<"daily" | "monthly">("daily");
   const [showAvg, setShowAvg] = useState<boolean>(true);
+  const [selectedYear, setSelectedYear] = useState<string>("all");
+  const [selectedMonth, setSelectedMonth] = useState<string>("all");
   const [predicting, setPredicting] = useState<boolean>(false);
   const [predictingHorizon, setPredictingHorizon] = useState<1 | 3 | 7 | null>(null);
   const [predError, setPredError] = useState<string>("");
@@ -41,29 +44,47 @@ export default function App() {
     );
     setAvailableCities(cities);
     setSelectedCities(cities.slice(0, 3));
+
     const dates = rawData.map((r) => r.date.slice(0, 10));
     setDateRange({ start: dates[0], end: dates[dates.length - 1] });
+
+    setSelectedYear("all");
+    setSelectedMonth("all");
   }, [rawData]);
 
   // チャートデータ生成
   useEffect(() => {
     if (!rawData.length || !selectedCities.length) return;
 
-    const filtered = rawData.filter((r) => selectedCities.includes(r.citycode));
+    let filtered = rawData.filter((r) => selectedCities.includes(r.citycode));
+    if (selectedYear !== "all") {
+      filtered = filtered.filter((r) => r.date.slice(0, 4) === selectedYear);
+    }
+    if (selectedMonth !== "all") {
+      filtered = filtered.filter((r) => r.date.slice(5, 7) === selectedMonth);
+    }
+
     const byDate: Record<string, ChartRow> = {};
+    const dateKey = (rawDate: string) =>
+      dateGranularity === "monthly" ? rawDate.slice(0, 7) : rawDate.slice(0, 10);
 
     for (const row of filtered) {
-      const date = row.date.slice(0, 10);
+      const date = dateKey(row.date);
       if (!byDate[date]) byDate[date] = { date };
       const name = CITY_NAMES[row.citycode] ?? `${row.citycode}`;
       byDate[date][name] = row.pollen < 0 ? null : row.pollen;
     }
 
     if (showAvg) {
+      const avgSource = rawData.filter((r) => {
+        if (r.pollen < 0) return false;
+        if (selectedYear !== "all" && r.date.slice(0, 4) !== selectedYear) return false;
+        if (selectedMonth !== "all" && r.date.slice(5, 7) !== selectedMonth) return false;
+        return true;
+      });
       const allByDate: Record<string, number[]> = {};
-      for (const row of rawData) {
-        if (row.pollen < 0) continue;
-        const date = row.date.slice(0, 10);
+      for (const row of avgSource) {
+        const date = dateKey(row.date);
         if (!allByDate[date]) allByDate[date] = [];
         allByDate[date].push(row.pollen);
       }
@@ -80,7 +101,7 @@ export default function App() {
     );
     setChartData(sorted);
     setPredData([]);
-  }, [rawData, selectedCities, showAvg]);
+  }, [rawData, selectedCities, showAvg, dateGranularity, selectedYear, selectedMonth]);
 
   const toggleCity = (code: number) => {
     setSelectedCities((prev) =>
@@ -170,10 +191,15 @@ export default function App() {
   const mergedData: ChartRow[] = [...chartData];
   if (predData.length) {
     const predByDate: Record<string, ChartRow> = {};
+    const dateKey = (rawDate: string) =>
+      dateGranularity === "monthly" ? rawDate.slice(0, 7) : rawDate.slice(0, 10);
     for (const p of predData) {
-      if (!predByDate[p.date])
-        predByDate[p.date] = { date: p.date, _predicted: true };
-      predByDate[p.date][p.cityName || `予測${p.citycode}`] = p.pollen;
+      if (selectedYear !== "all" && p.date.slice(0, 4) !== selectedYear) continue;
+      if (selectedMonth !== "all" && p.date.slice(5, 7) !== selectedMonth) continue;
+      const displayDate = dateKey(p.date);
+      if (!predByDate[displayDate])
+        predByDate[displayDate] = { date: displayDate, _predicted: true };
+      predByDate[displayDate][p.cityName || `予測${p.citycode}`] = p.pollen;
     }
     mergedData.push(...Object.values(predByDate));
   }
@@ -182,6 +208,9 @@ export default function App() {
     key: CITY_NAMES[code] ?? `${code}`,
     color: COLORS[i % COLORS.length],
   }));
+
+  const yearOptions = [...new Set(rawData.map((r) => r.date.slice(0, 4)))].sort();
+  const monthOptions = [...new Set(rawData.map((r) => r.date.slice(5, 7)))].sort();
 
   const lastHistoricalDate =
     chartData.length > 0 ? chartData[chartData.length - 1].date : "";
@@ -228,7 +257,58 @@ export default function App() {
               />
             </div>
 
-            <ChartTypeToggle chartType={chartType} onChange={setChartType} />
+            <div className="chart-controls-row">
+              <ChartTypeToggle chartType={chartType} onChange={setChartType} />
+              <div className="date-granularity-toggle">
+                <button
+                  className={`btn ${dateGranularity === "daily" ? "active" : ""}`}
+                  onClick={() => setDateGranularity("daily")}
+                >
+                  日次
+                </button>
+                <button
+                  className={`btn ${dateGranularity === "monthly" ? "active" : ""}`}
+                  onClick={() => setDateGranularity("monthly")}
+                >
+                  月次
+                </button>
+              </div>
+            </div>
+
+            <div className="period-selector-row">
+              <div className="period-selector-item">
+                <label>年</label>
+                <select
+                  title="表示する年を選択"
+                  aria-label="表示する年"
+                  value={selectedYear}
+                  onChange={(e) => setSelectedYear(e.target.value)}
+                >
+                  <option value="all">全期間</option>
+                  {yearOptions.map((year) => (
+                    <option key={year} value={year}>
+                      {year}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="period-selector-item">
+                <label>月</label>
+                <select
+                  title="表示する月を選択"
+                  aria-label="表示する月"
+                  value={selectedMonth}
+                  onChange={(e) => setSelectedMonth(e.target.value)}
+                >
+                  <option value="all">全期間</option>
+                  {monthOptions.map((month) => (
+                    <option key={month} value={month}>
+                      {month}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
 
             <PollenChart
               mergedData={mergedData}
@@ -237,6 +317,7 @@ export default function App() {
               showAvg={showAvg}
               predData={predData}
               lastHistoricalDate={lastHistoricalDate}
+              dateGranularity={dateGranularity}
             />
 
             <PollenLevelLegend />

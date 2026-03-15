@@ -33,14 +33,16 @@ export default function CustomTooltip({ active, payload, label, coordinate }: Pr
     <div ref={tooltipRef} className="tooltip-container">
       <div className="tooltip-label">{label}</div>
       {payload.map((p, idx) => {
-        const value = typeof p.value === "number" ? p.value : 0;
-        const lv = pollenLevel(value);
+        const value = p.value;
+        const isMissing = value == null || (typeof value === "number" && value < 0);
+        const displayValue = isMissing ? "欠測" : `${value} 個/cm²`;
+        const lv = typeof value === "number" && value >= 0 ? pollenLevel(value) : null;
         return (
           <div key={idx} className="tooltip-item">
             <span className="tooltip-dot" data-color={p.color ?? "#fff"} />
             <span className="tooltip-name">{p.name}:</span>
-            <span className="tooltip-value">{value < 0 ? "欠測" : `${value} 個/cm\xb2`}</span>
-            {value >= 0 && <span className="tooltip-level">({lv.label})</span>}
+            <span className="tooltip-value">{displayValue}</span>
+            {lv && <span className="tooltip-level">({lv.label})</span>}
           </div>
         );
       })}

@@ -17,39 +17,33 @@ export default function GeminiPanel({
 }: Props) {
   return (
     <div className="gemini-panel">
-      <div className="gemini-panel-title">
-        Gemini AI 予測
-      </div>
+      <div className="gemini-panel-title">Gemini AI 予測</div>
 
       <div className="gemini-panel-controls">
         <button
           className={`btn gemini-predict-btn ${predictingHorizon === 1 ? "active" : ""}`}
           onClick={() => onPredict(1)}
-          disabled={predicting && predictingHorizon !== 1}
+          disabled={predicting} // ← 修正
         >
           {predicting && predictingHorizon === 1 ? "予測中…" : "✦ 翌日の予測"}
         </button>
         <button
           className={`btn gemini-predict-btn ${predictingHorizon === 3 ? "active" : ""}`}
           onClick={() => onPredict(3)}
-          disabled={predicting && predictingHorizon !== 3}
+          disabled={predicting} // ← 修正
         >
           {predicting && predictingHorizon === 3 ? "予測中…" : "✦ 3日間の予測"}
         </button>
         <button
           className={`btn gemini-predict-btn ${predictingHorizon === 7 ? "active" : ""}`}
           onClick={() => onPredict(7)}
-          disabled={predicting && predictingHorizon !== 7}
+          disabled={predicting} // ← 修正
         >
           {predicting && predictingHorizon === 7 ? "予測中…" : "✦ 1週間の予測"}
         </button>
       </div>
 
-      {predError && (
-        <div className="gemini-error">
-          ⚠ {predError}
-        </div>
-      )}
+      {predError && <div className="gemini-error">⚠ {predError}</div>}
 
       {predData.length > 0 && !predicting && (
         <div className="pred-badge gemini-success">

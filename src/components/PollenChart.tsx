@@ -20,6 +20,7 @@ interface Props {
   showAvg: boolean;
   predData: PredRow[];
   lastHistoricalDate: string;
+  dateGranularity: "daily" | "monthly";
 }
 
 export default function PollenChart({
@@ -29,6 +30,7 @@ export default function PollenChart({
   showAvg,
   predData,
   lastHistoricalDate,
+  dateGranularity,
 }: Props) {
   return (
     <div className="glow chart-container">
@@ -45,7 +47,9 @@ export default function PollenChart({
           <XAxis
             dataKey="date"
             tick={{ fill: "#334155", fontSize: 10, fontFamily: "DM Mono" }}
-            tickFormatter={(v) => v.slice(5)}
+            tickFormatter={(v) =>
+              dateGranularity === "monthly" ? String(v) : String(v).slice(5)
+            }
             interval="preserveStartEnd"
             axisLine={{ stroke: "#1e3a5f" }}
             tickLine={false}
